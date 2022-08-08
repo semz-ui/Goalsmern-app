@@ -52,6 +52,33 @@ const updateGoal = asyncHandler(async (req, res) => {
   });
   res.status(200).json(updatedGoal);
 });
+
+// desc get single goal
+// route Get api/goals/:id
+//access Private
+const singleGoal = asyncHandler(async (req, res) => {
+  const goal = await Goal.findById(req.params.id);
+
+  if (!goal) {
+    res.status(400);
+    throw new Error("Goal not found");
+  }
+
+  // Make sure user is owner of goal
+  if (!req.user) {
+    res.status(401);
+    throw new Error("User not found");
+  }
+
+  // Making sure user is owner of goal
+  if (goal.user.toString() != req.user.id) {
+    res.status(401);
+    throw new Error("User not authorized");
+  }
+
+  res.status(200).json(goal);
+});
+
 // desc Delete goals
 // route Delete api/goals/:id
 //access Private
@@ -61,6 +88,8 @@ const deleteGoal = asyncHandler(async (req, res) => {
     res.status(400);
     throw new Error("Goal not found");
   }
+
+  // get single goal by id
 
   // Make sure user is owner of goal
   if (!req.user) {
@@ -83,4 +112,5 @@ module.exports = {
   setGoal,
   updateGoal,
   deleteGoal,
+  singleGoal,
 };
